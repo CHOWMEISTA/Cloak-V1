@@ -1,0 +1,63 @@
+return function(Utils)
+	local commands = {}
+
+	-- ;kill [target]
+	commands["kill"] = function(speaker, args)
+		for _, plr in Utils.getTargets(args[1], speaker) do
+			local char = plr.Character
+			if char and char:FindFirstChild("Humanoid") then
+				char.Humanoid.Health = 0
+			end
+		end
+	end
+
+	-- ;ws [target] [speed]
+	commands["ws"] = function(speaker, args)
+		local speed = tonumber(args[2]) or 16
+		for _, plr in Utils.getTargets(args[1], speaker) do
+			local char = plr.Character
+			if char and char:FindFirstChild("Humanoid") then
+				char.Humanoid.WalkSpeed = speed
+			end
+		end
+	end
+
+	-- ;jp [target] [jumpPower]
+	commands["jp"] = function(speaker, args)
+		local power = tonumber(args[2]) or 50
+		for _, plr in Utils.getTargets(args[1], speaker) do
+			local char = plr.Character
+			if char and char:FindFirstChild("Humanoid") then
+				char.Humanoid.UseJumpPower = true
+				char.Humanoid.JumpPower = power
+			end
+		end
+	end
+
+	-- ;tp [target] [destination]
+	commands["tp"] = function(speaker, args)
+		local targets = Utils.getTargets(args[1], speaker)
+		local destination = Utils.getTargets(args[2] or "me", speaker)[1]
+		
+		if destination and destination.Character and destination.Character:FindFirstChild("HumanoidRootPart") then
+			local destCFrame = destination.Character.HumanoidRootPart.CFrame
+			for _, plr in targets do
+				if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+					plr.Character.HumanoidRootPart.CFrame = destCFrame * CFrame.new(0, 0, -2)
+				end
+			end
+		end
+	end
+
+	-- ;kick [target] [reason]
+	commands["kick"] = function(speaker, args)
+		local reason = table.concat(args, " ", 2)
+		if reason == "" then reason = "Kicked by admin." end
+		
+		for _, plr in Utils.getTargets(args[1], speaker) do
+			plr:Kick(reason)
+		end
+	end
+
+	return commands
+end
